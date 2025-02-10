@@ -1,4 +1,3 @@
-// Bhagawat Chapagain
 import java.io.*;
 import java.util.*;
 
