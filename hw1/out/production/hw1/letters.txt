@@ -1,1 +1,5 @@
-AAAABBBBCCCDDDDDEEEE
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama2",
+  "prompt": "Do you copy? Give a one word response.",
+  "stream": false
+}'
