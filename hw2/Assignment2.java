@@ -1,7 +1,9 @@
 /* start the simulation */
 public class Assignment2 {
     public static void main(String[] args) {
-        Thread thread = new Thread(new Bakery());
+        Bakery b = new Bakery();
+
+        Thread thread = new Thread(b);
         thread.start();
 
         try {

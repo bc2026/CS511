@@ -1,0 +1,277 @@
+Speaker 1  
+So, like I said in the announcement, so that the aim today is to basically just do a bit of exercise
+
+Unknown Speaker  
+on monitors, because that's the last topic we produce. And
+
+Speaker 1  
+during that process, what I'll do is I'll also show you how to use condition variables. In fact, perhaps we could do that at the very beginning, because we can then use condition variables for some of these exercises. So perhaps let's follow up with produced consumers. So we could the produced consumers problem while back. We'll do the produced consumers with a little buffer of size, one that makes no difference for the point of view of condition variables. But so we had,
+
+Speaker 2  
+we had, say, some number of producers, and we had some number of consumers,
+
+Speaker 2  
+and these guys produce. So Buffer got produced, and some new random number. That's the plot,
+
+Unknown Speaker  
+and that's the and then this is the test.
+
+Speaker 2  
+So we have a buffer here, so buffer b equals buffer and
+
+Unknown Speaker  
+this buffer
+
+Unknown Speaker  
+has size one, so we just have integer buffer.
+
+Speaker 2  
+Initially. This just sets buffer to null, and then you've got a void synchronized void, because that's what we had originally produced, some some item.
+
+Unknown Speaker  
+And what we do here is while buffer
+
+Speaker 2  
+is not null. While the buffer is full, we wait. That was the original code we had. Otherwise, you put buffer equals P equals item,
+
+Unknown Speaker  
+and then you do a notified wall.
+
+Speaker 2  
+And here, and here, you have synchronized
+
+Unknown Speaker  
+void consumed,
+
+Unknown Speaker  
+and while buffer is empty,
+
+Speaker 2  
+waste, otherwise, you grab the item.
+
+Speaker 2  
+And you set it to null, to single, the same 10 new return the temp variable, but you also make sure to wake up everybody.
+
+Speaker 1  
+So this produce consumers, if you put sort of 10 and 10 then,
+
+Speaker 2  
+then this should, this should run without sort of dead locking, right? We have tempting consumers. There's no way this should data so we can try and run this Ruby.
+
+Speaker 2  
+PC, dot Ruby. So let's see what I missed. You're not using return statements, right? Because this is an easier, okay, that's long messages just for that. And I messed up again. Let's see, did I use a return somewhere else?
+
+Unknown Speaker  
+No signature consume of consume would be I soon. All
+
+Speaker 2  
+right, there we go. So we always get control back, because this will never deadlock. Of course, you could both say, I know, say nine producers and 10 consumers, then this should block, because one consumer will have no product to consume, and you can see it's fed up there that you control. See that.
+
+Unknown Speaker  
+So now the thing, the
+
+Speaker 1  
+sort of critique, basically, is that you can't use notifier. We saw that example already. Notifier is playing wrong, because that can lead to feedback situation, we have no more producers to say, wanting to produce, no more consumers, wanting to consume any other producer and a consumer both seeping the way it says. So the alternative to that is to use notify all. That's not wrong. That's perfectly correct, but it sounds a bit too much, because. If you consume one spot and the doctor has size one nail, why would you want to say wake up to producers? In fact, when you notify all, you won't really be waking up just producers. You'll also be waiting up consumers. So again, it's never wrong. We said this already the other day. It's never wrong to use notify all. That's always a safe bet. And if, whenever you're in doubt, use notify law, because in the very worst case, what you're doing is working everybody up. And then one by one, they'll they'll again access to the monitor. They'll check the condition. If the condition is false, then they'll push through. If the condition is true, they'll just go back to C, and since they have to regret that as a complete threat to the lock, there's no this is a critical section, so the work's just on. But the truth of the matter is that you are waking up a bunch of threats, so there's a lot of context switching going on, because they wake up and they go back to C, right? So we would like to avoid that, and the way we can do that is we can introduce our own weight sets. So right now we execute weights what happens is the third gets suspended and it's placed in the built in weight set. That's the one inside the object file. So we should be able to sort of do something like
+
+Unknown Speaker  
+type your Java object,
+
+Speaker 1  
+hit enter, and then here, there should be a wait set here causes the current thread to wait until another thread loads the notifying it. So this is an object, which means every object in your system, every class in the system, there is these operations. This is the root class, right? So every object will support the weight. And what it does is it places the thread in the in the weight set. This is once one way sector, so every thread gets placed in that, in that weight set. So what we'd like to do here is we'd like to be a little bit more smarter about this and have two different weight six. So the problem is that the built in weight set is just one, and there's no way to sort of split it in two. So what we do is we define our own weight six. Now, a weight six cannot exist without an associated lock. Okay. Why is this? Because the whole point of the weight is, when you execute a weight operation, you let go of the lock that you're currently holding, and then you see it's very important to let go of the lock, because if you don't do that, you kind of remember method, summarize method, go into the monitor, right? So you let go of the lock, and then you are suspended and you are placed in a weight set. So we can't define a weight set without having a lock. So what we'll do is we'll first define a lock, which is quickly generated to the built in lock, and then we'll define two weight sets and link them to that particular lock. The way we do that is we define a lock. L, it's a lock is an interface, by the way, and we only work in this course with the rigid locks. Reenter lock just means that if you hold the lock and you put another method tries to lock the lock. L, that doesn't cause a thin lock. Super nice. The same thing, I know, if we talked about that, if inside produce, suppose I know you wouldn't want to do that, but suppose you wouldn't all consume for whatever reason. It doesn't matter. The question you might ask yourself is, when I call consume from inside produce, will that be lock? And the question is actually a very good one, because when you see a supervised quantifier, basically what this means is, in order to execute this code? You have to grab the lock. If somebody else has the lock, then you have to wait. So if you're running inside this block, it means you do hold the lock. So when you execute an unsupervised method from an unsupervised method, the question is, does it deadlock when you call consume? Or since you really hold the lock, then you should just simply call this method and continue? Well, of course, the answer is yes, you can. If you run the code inside synchronize method, we call another surprise method, you'll there's no worries for that. And the technical word for that is that the implicit or intrinsic lock is re enterable or reentrant. So that's why we use a reentrant lock here, because we want the same behavior with the external lock. I'll show you in a moment how we sort of lock and unlock this. So that's the lock. And now we need the condition variables. The condition variable is nothing more than a weight six was reactive. Yes, it is reactant. And yes, yes. So we'll do condition and we'll have amp use, equals. And remember, condition variables or weights have to be associated to a lot. So now we'll associate this condition variable to the dot L, so l, dot, a new condition, and
+
+Unknown Speaker  
+we'll have another condition variable we'll call this can produce 10 to the.
+
+Unknown Speaker  
+L dot, new condition.
+
+Speaker 1  
+Now what do we do? We have to remove synchronize, because we no longer use the built in lock. Now we have to manually handle our external lock. So now we do l dock, and then we do try. We run all this code here, and pull the bottom, and then we have a finally store that will unlock to finally, basically make sure that whatever happens inside your code, even if you get an exception, whatever happens, you have an assurance that Java will always execute the code inside the binary.
+
+Unknown Speaker  
+So I'm going to tab that, and I'm going to do the same thing
+
+Unknown Speaker  
+here. All the code inside there.
+
+Speaker 1  
+And now the question is, what do we do with the weight? This will not work. In fact, if I run this code, I'm going to get a monitor and equal state exception and you can try it. Why am I getting this monitor first do the default
+
+Unknown Speaker  
+current dot blocks. I
+
+Speaker 1  
+think that's the that's the package. So when I run this, if I scroll up here, I
+
+Unknown Speaker  
+this is a stack trace, of course, that's why it's so long. Hello.
+
+Speaker 2  
+Well, it should be it appears different. It should have already appeared further
+
+Unknown Speaker  
+down. Where is the point of call.
+
+Unknown Speaker  
+This is what I typed,
+
+Speaker 1  
+and this is the exception you get. Real wants to take exception. So what does that mean? But that's because when you do a weight, you are trying to let go of the lock that you do not hold. That's the technical meaning of it. So you might use a weight there, because weight tries to let go of the lock, that is the intrinsic lock which you reacted. So what you need to do is let go of this lock, out, okay, and then go to C. So the way you do that is you do not say weight, but an L Y equals an A is a prefix on a condition variable, and you say and use
+
+Unknown Speaker  
+complex that
+
+Speaker 1  
+will let go of the lock L, because the condition variable is associated, and we'll suspend the thread inside that weight success. And then this, we're going to change this in a moment, and let's add the same thing here. So can consume. Now, when a producer has produced into a buffer, so say it was empty, it should wake up a consumer. So the way we do that is we just do a
+
+Unknown Speaker  
+consume dot, and this guy Does
+
+Unknown Speaker  
+a produce.so
+
+Unknown Speaker  
+notice now that a producer
+
+Unknown Speaker  
+wakes up one and only one
+
+Speaker 1  
+consumer, and a consumer wakes up one and only one producer. So now if I run this code, we should be fine to have exactly the same behavior as before. This means I mistyped something
+
+Unknown Speaker  
+remnants and then run it again and
+
+Unknown Speaker  
+see if I can scroll up,
+
+Unknown Speaker  
+because I have a question about the code,
+
+Unknown Speaker  
+consume, consume, direct consumer there,
+
+Unknown Speaker  
+and then look at the names. It's still same here.
+
+Speaker 2  
+Nurses property consumed for class, backward. So where's consumer? That I write consume, I have consume and produce. That's the correct name, and then I can do B, dot consume here. So that's that's all good, and we got produce as well.
+
+Unknown Speaker  
+Should you have the return time after that.
+
+Speaker 1  
+No, no, no, no, no, this goes there. That's fine, yeah, oh no, this is camp abuse,
+
+Speaker 2  
+right? Saying that the camp is the consuming variable doesn't exist, as we'd say, in a really contrived way, right?
+
+Speaker 2  
+So, yeah, there you go. That's we didn't control that, because every consumer gets consumed, whatever producer produces, because they want to mention, yeah, sorry, you had a question,
+
+Unknown Speaker  
+yeah. So how I just have a question about that
+
+Speaker 3  
+attorney statement, because you're returning at. And how does elder unlock run if you're like returning before?
+
+Speaker 1  
+No, no, really return. That's the thing. With the try. Finally, no matter what you do here, right after you've executed all this code, you're gonna unit execute the other that's what, that's what the construct ensures. That's a very good question. In fact, I've gotten that question before, so it does say return here at the end, but you will always execute the L dot Bundler before the activation record is removed from this that's from the state. Yeah. What's the difference between the signal? Oh, there is no difference, just that signal is the name of the method when you have condition variables and notified is the name of the method. When you use the built in lock, that's the only thing. So if you so use single or you could use this, dot notify. They are the same thing. This is the method, the method supported by the object class, the built in class objects, and this is the method that they supported by condition, the condition the condition definition interface. So if you So, basically, you use weights with notifying no two eyeballs, and use a weight with signal and signal. That's the important thing. You have to remember, you don't mix any of the two, because if you mix them, you'll get this in even larger state exception here. Yeah, theme is alpha. It. Yeah. So this means that if you if the lock is available, you're going to grab it, not even stop running code. And if another query wants to execute either this lock or this L dot lock that's gonna, it's gonna suspend until that lock becomes, okay, yes, absolutely, absolutely, yes. In a way, we haven't really changed much. I mean, the only thing, I mean we have, of course, is the COVID difference. But consistently speaking, you still, you still lock and unlock at the very beginning, just that you can remain with synchronized keyword that's done for you. And then, if the condition is waiting for the Met, instead of doing a weight, you do and a weight. The only difference is that this external lock can have any number of condition variables associated, whereas that built in lock only has one condition, only, one basis. So you have to put all the threads in there no maximal condition they're waiting for. Whereas here I can say, oh, you're a consumer, you wait in this basis. You're a producer, you're waiting that basis. And then I can wait up selectively.
+
+Unknown Speaker  
+Is there a way to implement fair or do I have to create a cue
+
+Speaker 1  
+for teachers? Well, what do you mean by fair locking? So, you know, like in the train problem,
+
+Speaker 4  
+it makes sense in my head to have, like, if you got there, that train got there.
+
+Speaker 1  
+Oh, I see it should get there. No, we're not doing any of that here. No, you have to program that in, like we did with the code. I'll post it later, like that with the readers, right? Well, no readers write. Well, we did that with semaphores, but I mean using monitors, we saw the job with the semaphore implementation. So how do you do the same force using monitors? And then how to avoid this bar g, which is when you steal a permit. So basically, you're a Singapore you want to acquire a permit. There are no permits. You go to sleep now you release. When you release, you'd expect the scale asleep to be awoken and to be able to go in. Not true, because when you do the release, it's possible that permit from outside. So this is an E guy, and the guy from inside is the Debbie guy, which you are working, by the way. So who needs to go in? You don't know it's possible that the E guy, the guy from outside, can go in and check other equipment. Yes, it goes in. And the guy who's sleeping is now a worker is going to check it's going back to the top of the wall, and it's going to say, Are there pruners? No, because the guy from outside got to grab their seat. So it's not fair, in that sense. In fact, we talk about starvation that case, because the guy that goes to sleep inside could stop how, as long as somebody from outside comes in every now and then, that's how you start. So the way to avoid that is, at least one way, is to use this idea of time steps. And whenever you come in from outside, you revoke the time step. And whenever you release, you restart your counter or your time. And then basically what happens is, when you wake up, you make sure the guy that wakes up woke up after you hit the release. Otherwise, if somebody came in from outside, then the timestamp will be sort of different, older. That's the intrusion behind the solution. And there's another one which we never got into, but I recommend that you take a look at this every now and then. I think. Perhaps one of these days we should present it in class.
+
+Unknown Speaker  
+It's nice and easy to read, but for this one
+
+Unknown Speaker  
+here, basically what you do is you, you,
+
+Speaker 1  
+you set up a queue, and then, since you've gotten you can use, use Filter wastes on specific objects. You create other objects. You do a new of the object loss with nothing inside it. All you do is you use the block of that object that's and you put all those objects inside each The idea is kind of pretty smart, actually. Let me leave that there.
+
+Unknown Speaker  
+Where is this? I left the link today here somewhere, and
+
+Unknown Speaker  
+I highly recommend that you Read, Okay, never mind. I'll just
+
+Unknown Speaker  
+type this in here. It's
+
+Unknown Speaker  
+pretty, it's pretty,
+
+Unknown Speaker  
+sort of relatively easy to read.
+
+Speaker 1  
+Let's just take a quick look. I mean, since you asked, let me just just take a quick look at the support tips and provision by me, by reason, one or two light COVID tips, the weak semantic data. See, any mechanism provides little control over the order, in which creates five resources, which encourages use of in the context, so in which arbitrary trade is selected from a set of prints competing for a resource. So for such synchronization problems, that's just not good enough. For example, if you want to ensure fairness, this is not
+
+Unknown Speaker  
+good enough. So it gives you a couple of examples. Where's the let me see. I
+
+Speaker 1  
+let me see. So anyway, here's the pattern. I think the code for readers writers was pretty
+
+Unknown Speaker  
+clear. There's the dining clusters problem as well. If I can
+
+Speaker 2  
+remember, what is this? The next dining class to the readers, writers. Let me see this is there. Is
+
+Unknown Speaker  
+there a Singapore? No.
+
+Unknown Speaker  
+So let me see.
+
+Speaker 1  
+Yeah, so we have to go over this again. But basically the idea is, you have, you have, you have, think of this as a queue. I mean, it says vector, but that's because they have, and they have all the pieces as if they were always access elements from the end and then sort of put them at the beginning. But again, we haven't seen the really details of this, but perhaps you can more or less see what's going on by looking at this code. You create a new object. Now that object has nothing inside, so just a plain object, and you store it, I mean, in a variable list. And now you synchronize on that object, so you're using the look for that object, all right? You always have to do synchronize on this. This is to avoid race conditions. That's why you have to synchronize. That's a plain old race condition avoidance. So that's why you have to use this, so that if you have because look at this, if you run this line, think of this. I don't want to get carried away, but there's no surprise here, right? So two things to bring this to two things to bring the slide one up together. They each have their own case, and now the object is to local variable, right? And they can both execute the spine, but in any interleaving, why? Because you sometimes have two different objects. So there's no race condition or anything they're going on. But now you want to access sort of variables, like implementing counters on writers which are shared. So now you do have expedition among the two things potentially. So that part you want to protect, that's what you use to synchronize on this. Because who's this? It's the one singleton office writer.
+
+Unknown Speaker  
+Okay? Single topic that has one instance, right?
+
+Speaker 1  
+And so what you get, basically, it doesn't really matter what it does. The important thing is it does some sort of bookkeeping. And what it does is it adds an element to the end of the queue, an inherent add. Answers that this object, and it might say, this is pretty weird, because it seems to add an object into a queue which which has no sort of which has nothing inside. But what happens next? It does a dry SNL weight. Again, read this as a as the weight operation objects. So what this does is it doesn't work on this on this object, and that means that it goes to sleep on this object. So basically, what you have is you have the cube of sleeping objects for papers. What's the cube of sleeping objects. So now you wake them up. How are you going to wake them up? Well, using the queue structure.
+
+Unknown Speaker  
+So when you do your next notify, who you
+
+Speaker 1  
+how are you going to what object? When you do the notify to the W object that's next in the queue, you're going to do a notify on that on that, on that object, got a lot of overhead for, well, it is, but that's the thing. I mean, the these monitors, the way they implemented in the language simply doesn't it's so general purpose if you wish, that it's too flexible if you wish. I mean, in a way, that's kind of what you want, right? Because it's in a general purpose language, you want to provide sort of very general purpose abstractions, and then if you need more specific things, will you have to build on top of those, right? It kind of makes sense. But anyway, this is, I think it's really smart, by the way. Of course, we would have to take a look at the details. But from what I'm saying, you kind of see what's going on. Like I said, you create an object, you sit down with that object, and then what you do here is you put your object in at the end of the queue. That object has nothing. It's an empty object. The reason why you need it is because you need to use the slide. And then you do this. And also wait, this is going to put the thread to steam. So what happens is, you put the you put every time you say reads. Suppose the reader writes, is somebody writing, and you have 10 threads a word, right? One by one, they'll all go to sleep, okay? But they don't interfere with each other, because they're able to awake on a different object. So they all do away from different options. The good thing about this is that, how you be, how do you wake these up? So when you're done reading, they should be after off the right here. The off the right should grab the next guy from the queue and go home to five from the from the top of the queue. So if this works correctly, there should be an after, right here, here, notify, right that's the one this should grab the next element. So if there are people see, you grab the first element from the cube you see, and then there's a notify on that object. Make sense? I mean, from a, from a programming point of view, it's pretty, pretty simple in a way. Of course, there is no overhead, I agree with you, but you're using objects, personal objects, to use their locks, and then put all those objects in a queue a penalty. And then when you notify, you do a notified SNL, SNL for the dial, psnl to go from so, I think that's pretty that's pretty spot. And this technique, of course, you can apply to other to other problems, not just through those writers. In fact, you have the example here for for
+
+Unknown Speaker  
+guiding philosophers as well. Does this does the same thing? Anyway,
+
+Speaker 1  
+but I think it's a good question, and I recommend you read up on it, because
+
+Speaker 5  
+I was gonna ask about you mentioned the timing aspect. So does that only work for like, one thread at a time? Then, instead of time, like, so start a tiring release as you
+
+Speaker 1  
+stop, or is that's another means of ensuring that you implement a fair I tried
+
+Unknown Speaker  
+to I tried to try To do
+
+Unknown Speaker  
+the other day on the stage Singapore here.
+
+Unknown Speaker  
+Fair, Singapore, so.
+
+Unknown Speaker  
+If I just clear,
+
+Transcribed by https://otter.ai
