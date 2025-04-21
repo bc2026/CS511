@@ -84,7 +84,7 @@ loop(State, Request, Ref) ->
 
 	%% GUI requests the nickname of client
 	whoami ->
-	    {{dummy_target, dummy_response}, State};
+	   {State#cl_st.nick, State};
 
 	%% GUI requests to update nickname to Nick
 	{nick, Nick} ->
@@ -184,15 +184,21 @@ do_new_nick(State, Ref, NewNick) ->
     end.
 
 
-%% executes send message protocol from client perspective
 do_msg_send(State, Ref, ChatName, Message) ->
-    io:format("client:do_new_nick(...): IMPLEMENT ME~n"),
-    {{dummy_target, dummy_response}, State}.
+    ConCh = State#cl_st.con_ch,
+    case maps:find(ChatName, ConCh) of
+        error ->
+            %% Chatroom not joined
+            {{error, not_in_chatroom}, State};
+        {ok, ChatroomPID} ->
+            ChatroomPID ! {self(), Ref, message, Message},
+            %% Return nickname too so GUI can show: Nick: Message
+            { {ok, State#cl_st.nick}, State }
+    end.
 
-%% executes new incoming message protocol from client perspective
 do_new_incoming_msg(State, _Ref, CliNick, ChatName, Msg) ->
-    %% pass message along to gui
-    gen_server:call(list_to_atom(State#cl_st.gui), {msg_to_GUI, ChatName, CliNick, Msg}),
+    gen_server:call(list_to_atom(State#cl_st.gui),
+                    {msg_to_GUI, ChatName, CliNick, Msg}),
     {ok_msg_received, State}.
 
 do_quit(State, Ref) ->
@@ -205,4 +211,7 @@ do_quit(State, Ref) ->
     after 1000 ->
         {{error, quit_timeout}, State}
     end.
+
+
+
 
