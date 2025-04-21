@@ -109,10 +109,31 @@ loop(State, Request, Ref) ->
 	    {unhandled_request, State}
     end.
 
-%% executes `/join` protocol from client perspective
 do_join(State, Ref, ChatName) ->
-    io:format("client:do_join(...): IMPLEMENT ME~n"),
-    {{dummy_target, dummy_response}, State}.
+    ConCh = State#cl_st.con_ch,
+    % Check if we're already in the chatroom
+    case maps:is_key(ChatName, ConCh) of
+        true ->
+            {err, State};
+        false ->
+            % Send join request to server
+            ServerPid = whereis(server),
+            ServerPid ! {self(), Ref, join, ChatName},
+
+            receive
+                {server, join_result, {ok, ChatroomPID, History}} ->
+                    % Update client state to track this chatroom
+                    NewConCh = maps:put(ChatName, ChatroomPID, ConCh),
+                    NewState = State#cl_st{con_ch = NewConCh},
+                    {History, NewState};
+
+                {server, join_result, err} ->
+                    {err, State}
+            after 2000 ->
+                {{error, timeout}, State}
+            end
+    end.
+
 
 %% executes `/leave` protocol from client perspective
 do_leave(State, Ref, ChatName) ->

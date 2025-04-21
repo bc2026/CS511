@@ -58,10 +58,48 @@ loop(State) ->
 	    loop(State)
     end.
 
-%% executes join protocol from server perspective
 do_join(ChatName, ClientPID, Ref, State) ->
-    io:format("server:do_join(...): IMPLEMENT ME~n"),
-    State.
+    RegMap = State#serv_st.registrations,
+    ChatMap = State#serv_st.chatrooms,
+    Nicks = State#serv_st.nicks,
+
+    % 1. Already in chatroom?
+    ClientList = maps:get(ChatName, RegMap, []),
+    case lists:member(ClientPID, ClientList) of
+        true ->
+            ClientPID ! {server, join_result, err},
+            State;
+        false ->
+            % 2. Ensure chatroom process exists
+            {ChatroomPID, UpdatedChatMap} =
+                case maps:find(ChatName, ChatMap) of
+                    {ok, Pid} -> {Pid, ChatMap};
+                    error ->
+                        Pid = spawn(chatroom, start_chatroom, [ChatName]),
+                        {Pid, maps:put(ChatName, Pid, ChatMap)}
+                end,
+
+            % 3. Register client to chatroom
+            Nick = maps:get(ClientPID, Nicks),
+            ChatroomPID ! {self(), Ref, register, ClientPID, Nick},
+
+            % 4. Get history (you could add message passing here, but assume chatroom replies with list)
+            ChatroomPID ! {self(), get_state},
+            History =
+                receive
+                    {get_state, #chat_st{history = Hist}} -> Hist
+                after 1000 ->
+                    [] % fallback
+                end,
+
+            % 5. Update registration
+            NewRegMap = maps:put(ChatName, [ClientPID | ClientList], RegMap),
+
+            % 6. Reply to client and return updated state
+            ClientPID ! {server, join_result, {ok, ChatroomPID, History}},
+            State#serv_st{registrations = NewRegMap, chatrooms = UpdatedChatMap}
+    end.
+
 
 %% executes leave protocol from server perspective
 do_leave(ChatName, ClientPID, Ref, State) ->
