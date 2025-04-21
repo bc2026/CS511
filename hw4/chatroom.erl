@@ -38,10 +38,11 @@ loop(State) ->
 end,
     loop(NewState).
 
-%% This function should register a new client to this chatroom
-do_register(State, Ref, ClientPID, ClientNick) ->
-    io:format("chatroom:do_register(...): IMPLEMENT ME~n"),
-    State.
+do_register(State, _Ref, ClientPID, ClientNick) ->
+    OldRegs = State#chat_st.registrations,
+    NewRegs = maps:put(ClientPID, ClientNick, OldRegs),
+    NewState = State#chat_st{registrations = NewRegs},
+    NewState.
 
 
 do_unregister(State, ClientPID) ->
