@@ -135,10 +135,30 @@ do_join(State, Ref, ChatName) ->
     end.
 
 
-%% executes `/leave` protocol from client perspective
 do_leave(State, Ref, ChatName) ->
-    io:format("client:do_leave(...): IMPLEMENT ME~n"),
-    {{dummy_target, dummy_response}, State}.
+    ConCh = State#cl_st.con_ch,
+
+    case maps:is_key(ChatName, ConCh) of
+        false ->
+            {err, State};  %% Not connected to this chatroom
+
+        true ->
+            ServerPid = whereis(server),
+            ServerPid ! {self(), Ref, leave, ChatName},
+
+            receive
+                {server, leave_result, ok} ->
+                    NewConCh = maps:remove(ChatName, ConCh),
+                    NewState = State#cl_st{con_ch = NewConCh},
+                    {ok, NewState};
+
+                {server, leave_result, err} ->
+                    {err, State}
+            after 2000 ->
+                {{error, leave_timeout}, State}
+            end
+    end.
+
 
 do_new_nick(State, Ref, NewNick) ->
     case State#cl_st.nick =:= NewNick of
@@ -175,7 +195,14 @@ do_new_incoming_msg(State, _Ref, CliNick, ChatName, Msg) ->
     gen_server:call(list_to_atom(State#cl_st.gui), {msg_to_GUI, ChatName, CliNick, Msg}),
     {ok_msg_received, State}.
 
-%% executes quit protocol from client perspective
 do_quit(State, Ref) ->
-    io:format("client:do_new_nick(...): IMPLEMENT ME~n"),
-    {{dummy_target, dummy_response}, State}.
+    ServerPid = whereis(server),
+    ServerPid ! {self(), Ref, quit},
+
+    receive
+        {server, quit_ack} ->
+            {ack_quit, State}
+    after 1000 ->
+        {{error, quit_timeout}, State}
+    end.
+

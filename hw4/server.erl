@@ -101,10 +101,38 @@ do_join(ChatName, ClientPID, Ref, State) ->
     end.
 
 
-%% executes leave protocol from server perspective
 do_leave(ChatName, ClientPID, Ref, State) ->
-    io:format("server:do_leave(...): IMPLEMENT ME~n"),
-    State.
+    RegMap = State#serv_st.registrations,
+    ChatMap = State#serv_st.chatrooms,
+
+    % Check if the chatroom exists
+    case maps:find(ChatName, RegMap) of
+        error ->
+            ClientPID ! {server, leave_result, err},
+            State;
+
+        {ok, ClientList} ->
+            case lists:member(ClientPID, ClientList) of
+                false ->
+                    ClientPID ! {server, leave_result, err},
+                    State;
+
+                true ->
+                    % Remove client from chatroom registration list
+                    NewClientList = lists:delete(ClientPID, ClientList),
+                    NewRegMap = maps:put(ChatName, NewClientList, RegMap),
+
+                    % Send message to chatroom to unregister
+                    ChatroomPID = maps:get(ChatName, ChatMap),
+                    ChatroomPID ! {self(), Ref, unregister, ClientPID},
+
+                    % Acknowledge leave
+                    ClientPID ! {server, leave_result, ok},
+
+                    State#serv_st{registrations = NewRegMap}
+            end
+    end.
+
 
 
 get_chatrooms_of_client(ClientPID, RegistrationsMap, ChatroomMap) ->
@@ -157,8 +185,37 @@ do_new_nick(State, Ref, ClientPID, NewNick) ->
     end.
 
 
-
-%% executes client quit protocol from server perspective
 do_client_quit(State, Ref, ClientPID) ->
-    io:format("server:do_client_quit(...): IMPLEMENT ME~n"),
-    State.
+    Nicks = State#serv_st.nicks,
+    RegMap = State#serv_st.registrations,
+    ChatMap = State#serv_st.chatrooms,
+
+    % Remove client from all chatrooms
+    NewRegMap = maps:map(
+        fun(_ChatName, ClientList) ->
+            lists:delete(ClientPID, ClientList)
+        end,
+        RegMap
+    ),
+
+    % Notify each chatroom that client has quit
+    ChatroomPIDs = get_chatrooms_of_client(ClientPID, RegMap, ChatMap),
+    lists:foreach(
+        fun(Pid) ->
+            Pid ! {self(), Ref, unregister, ClientPID}
+        end,
+        ChatroomPIDs
+    ),
+
+    % Remove client from nickname map
+    NewNicks = maps:remove(ClientPID, Nicks),
+
+    % Respond to client
+    ClientPID ! {server, quit_ack},
+
+    State#serv_st{
+        nicks = NewNicks,
+        registrations = NewRegMap
+    }.
+
+

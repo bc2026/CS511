@@ -43,10 +43,13 @@ do_register(State, Ref, ClientPID, ClientNick) ->
     io:format("chatroom:do_register(...): IMPLEMENT ME~n"),
     State.
 
-%% This function should unregister a client from this chatroom
+
 do_unregister(State, ClientPID) ->
-    io:format("chatroom:do_unregister(...): IMPLEMENT ME~n"),
-    State.
+    Regs = State#chat_st.registrations,
+    NewRegs = maps:remove(ClientPID, Regs),
+    State#chat_st{registrations = NewRegs}.
+
+
 
 do_update_nick(State, ClientPID, NewNick) ->
     OldRegs = State#chat_st.registrations,
