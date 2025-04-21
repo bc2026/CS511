@@ -33,6 +33,7 @@ main(InitialState) ->
 %% chatrooms that are not directly tied to an ongoing request cycle.
 listen(State) ->
     receive
+		
         {request, From, Ref, Request} ->
 	    %% the loop method will return a response as well as an updated
 	    %% state to pass along to the next cycle
@@ -188,13 +189,18 @@ do_msg_send(State, Ref, ChatName, Message) ->
     ConCh = State#cl_st.con_ch,
     case maps:find(ChatName, ConCh) of
         error ->
-            %% Chatroom not joined
             {{error, not_in_chatroom}, State};
+
         {ok, ChatroomPID} ->
             ChatroomPID ! {self(), Ref, message, Message},
-            %% Return nickname too so GUI can show: Nick: Message
-            { {ok, State#cl_st.nick}, State }
+            receive
+                {ChatroomPID, Ref, ack_msg} ->
+                    { {msg_sent, State#cl_st.nick}, State }
+            after 1000 ->
+                {{error, msg_timeout}, State}
+            end
     end.
+
 
 do_new_incoming_msg(State, _Ref, CliNick, ChatName, Msg) ->
     gen_server:call(list_to_atom(State#cl_st.gui),

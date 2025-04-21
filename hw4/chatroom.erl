@@ -61,29 +61,31 @@ do_update_nick(State, ClientPID, NewNick) ->
         false ->
             State
     end.
-
-
-do_propegate_message(State, _Ref, ClientPID, Message) ->
+do_propegate_message(State, Ref, ClientPID, Message) ->
     Regs = State#chat_st.registrations,
     History = State#chat_st.history,
 
-    % Get sender's nickname
-    SenderNick = maps:get(ClientPID, Regs),
+    case maps:find(ClientPID, Regs) of
+        {ok, SenderNick} ->
+            % Send to all clients except sender
+            lists:foreach(
+                fun({Pid, _Nick}) ->
+                    if
+                        Pid =/= ClientPID ->
+                            Pid ! {request, self(), Ref, {incoming_msg, SenderNick, State#chat_st.name, Message}};
+                        true -> ok
+                    end
+                end,
+                maps:to_list(Regs)
+            ),
 
-    % Append to history
-    NewHistory = [{SenderNick, Message} | History],
+           
+            ClientPID ! {self(), Ref, ack_msg},
 
-    % Notify all clients except the sender
-    lists:foreach(
-        fun({Pid, _Nick}) ->
-            if
-                Pid =/= ClientPID ->
-                    Pid ! {incoming_msg, SenderNick, State#chat_st.name, Message};
-                true ->
-                    ok
-            end
-        end,
-        maps:to_list(Regs)
-    ),
+            % Update history
+            NewHistory = [{SenderNick, Message} | History],
+            State#chat_st{history = NewHistory};
 
-    State#chat_st{history = NewHistory}.
+        error ->
+            State
+    end.
