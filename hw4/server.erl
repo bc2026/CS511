@@ -106,10 +106,57 @@ do_leave(ChatName, ClientPID, Ref, State) ->
     io:format("server:do_leave(...): IMPLEMENT ME~n"),
     State.
 
-%% executes new nickname protocol from server perspective
+
+get_chatrooms_of_client(ClientPID, RegistrationsMap, ChatroomMap) ->
+    maps:fold(fun(ChatName, ClientList, Acc) ->
+        case lists:member(ClientPID, ClientList) of
+            true ->
+                case maps:find(ChatName, ChatroomMap) of
+                    {ok, Pid} -> [Pid | Acc];
+                    error -> Acc
+                end;
+            false -> Acc
+        end
+    end, [], RegistrationsMap).
+
+
 do_new_nick(State, Ref, ClientPID, NewNick) ->
-    io:format("server:do_new_nick(...): IMPLEMENT ME~n"),
-    State.
+    Nicks = State#serv_st.nicks,
+
+    % Check if new nick is already in use
+    case lists:member(NewNick, maps:values(Nicks)) of
+        true ->
+            ClientPID ! {server, change_nick_result, {error, nickname_in_use}},
+            State;
+
+        false ->
+            case maps:find(ClientPID, Nicks) of
+                error ->
+                    ClientPID ! {server, change_nick_result, {error, no_such_nick}},
+                    State;
+
+                {ok, _OldNick} ->
+                    % Update nickname mapping
+                    NewNicks = maps:put(ClientPID, NewNick, Nicks),
+
+                    % Notify all chatrooms about the nickname change
+                    ChatroomPIDs = get_chatrooms_of_client(
+                        ClientPID,
+                        State#serv_st.registrations,
+                        State#serv_st.chatrooms
+                    ),
+                    lists:foreach(
+                        fun(Pid) -> Pid ! {self(), Ref, update_nick, ClientPID, NewNick} end,
+                        ChatroomPIDs
+                    ),
+
+                    % Send confirmation and update server state
+                    ClientPID ! {server, change_nick_result, ok},
+                    State#serv_st{nicks = NewNicks}
+            end
+    end.
+
+
 
 %% executes client quit protocol from server perspective
 do_client_quit(State, Ref, ClientPID) ->
