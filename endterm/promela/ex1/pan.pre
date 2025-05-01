@@ -1,0 +1,52 @@
+# 1 "ex1.pml"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 465 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "ex1.pml" 2
+int x = 0;
+
+active proctype P(){
+    do
+    ::
+        if
+        :: x<200 ->
+        atomic {
+            x = x+1;
+        }
+        :: else -> break
+        fi
+    od
+}
+
+
+
+
+active proctype Q(){
+   do
+    ::
+        if
+        :: x<200 ->
+        atomic {
+            x = x-1;
+        }
+        :: else -> break
+        fi
+    od
+}
+
+active proctype R(){
+
+       do
+    ::
+        if
+        :: x<200 ->
+        atomic {
+            x = 0;
+        }
+        :: else -> break
+        fi
+    od
+
+}
