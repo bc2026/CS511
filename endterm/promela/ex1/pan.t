@@ -26,63 +26,69 @@ settable(void)
 
 	/* proctype 2: R */
 
-	trans[2] = (Trans **) emalloc(12*sizeof(Trans *));
+	trans[2] = (Trans **) emalloc(13*sizeof(Trans *));
 
-	trans[2][9]	= settr(30,0,8,1,0,".(goto)", 0, 2, 0);
-	T = trans[2][8] = settr(29,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(29,0,6,0,0,"DO", 0, 2, 0);
-	T = trans[2][6] = settr(27,0,0,0,0,"IF", 0, 2, 0);
-	T = T->nxt	= settr(27,0,1,0,0,"IF", 0, 2, 0);
-	    T->nxt	= settr(27,0,4,0,0,"IF", 0, 2, 0);
-	trans[2][1]	= settr(22,0,3,3,0,"((x<200))", 1, 2, 0);
-	T = trans[ 2][3] = settr(24,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(24,2,2,0,0,"ATOMIC", 1, 2, 0);
-	trans[2][2]	= settr(23,0,8,4,4,"x = 0", 1, 2, 0);
-	trans[2][7]	= settr(28,0,8,1,0,".(goto)", 0, 2, 0);
-	trans[2][4]	= settr(25,0,11,2,0,"else", 0, 2, 0);
-	trans[2][5]	= settr(26,0,11,1,0,"goto :b2", 0, 2, 0);
-	trans[2][10]	= settr(31,0,11,1,0,"break", 0, 2, 0);
-	trans[2][11]	= settr(32,0,0,5,5,"-end-", 0, 3500, 0);
+	trans[2][10]	= settr(33,0,9,1,0,".(goto)", 0, 2, 0);
+	T = trans[2][9] = settr(32,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(32,0,8,0,0,"DO", 0, 2, 0);
+	T = trans[ 2][8] = settr(31,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(31,2,6,0,0,"ATOMIC", 1, 2, 0);
+	T = trans[2][6] = settr(29,2,0,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(29,2,1,0,0,"IF", 1, 2, 0);
+	    T->nxt	= settr(29,2,4,0,0,"IF", 1, 2, 0);
+	trans[2][1]	= settr(24,0,9,3,3,"((x==200))", 1, 2, 0); /* m: 2 -> 9,0 */
+	reached2[2] = 1;
+	trans[2][2]	= settr(0,0,0,0,0,"x = 0",0,0,0);
+	trans[2][3]	= settr(0,0,0,0,0,"assert(((x>=0)&&(x<=200)))",0,0,0);
+	trans[2][7]	= settr(30,0,9,1,0,".(goto)", 1, 2, 0);
+	trans[2][4]	= settr(27,2,5,2,0,"else", 1, 2, 0);
+	trans[2][5]	= settr(28,0,12,1,0,"goto :b2", 1, 2, 0);
+	trans[2][11]	= settr(34,0,12,1,0,"break", 0, 2, 0);
+	trans[2][12]	= settr(35,0,0,4,4,"-end-", 0, 3500, 0);
 
 	/* proctype 1: Q */
 
-	trans[1] = (Trans **) emalloc(12*sizeof(Trans *));
+	trans[1] = (Trans **) emalloc(13*sizeof(Trans *));
 
-	trans[1][9]	= settr(19,0,8,1,0,".(goto)", 0, 2, 0);
-	T = trans[1][8] = settr(18,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(18,0,6,0,0,"DO", 0, 2, 0);
-	T = trans[1][6] = settr(16,0,0,0,0,"IF", 0, 2, 0);
-	T = T->nxt	= settr(16,0,1,0,0,"IF", 0, 2, 0);
-	    T->nxt	= settr(16,0,4,0,0,"IF", 0, 2, 0);
-	trans[1][1]	= settr(11,0,3,6,0,"((x<200))", 1, 2, 0);
-	T = trans[ 1][3] = settr(13,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(13,2,2,0,0,"ATOMIC", 1, 2, 0);
-	trans[1][2]	= settr(12,0,8,7,7,"x = (x-1)", 1, 2, 0);
-	trans[1][7]	= settr(17,0,8,1,0,".(goto)", 0, 2, 0);
-	trans[1][4]	= settr(14,0,11,2,0,"else", 0, 2, 0);
-	trans[1][5]	= settr(15,0,11,1,0,"goto :b1", 0, 2, 0);
-	trans[1][10]	= settr(20,0,11,1,0,"break", 0, 2, 0);
-	trans[1][11]	= settr(21,0,0,8,8,"-end-", 0, 3500, 0);
+	trans[1][10]	= settr(21,0,9,1,0,".(goto)", 0, 2, 0);
+	T = trans[1][9] = settr(20,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(20,0,8,0,0,"DO", 0, 2, 0);
+	T = trans[ 1][8] = settr(19,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(19,2,6,0,0,"ATOMIC", 1, 2, 0);
+	T = trans[1][6] = settr(17,2,0,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(17,2,1,0,0,"IF", 1, 2, 0);
+	    T->nxt	= settr(17,2,4,0,0,"IF", 1, 2, 0);
+	trans[1][1]	= settr(12,0,9,5,5,"((x>0))", 1, 2, 0); /* m: 2 -> 9,0 */
+	reached1[2] = 1;
+	trans[1][2]	= settr(0,0,0,0,0,"x = (x-1)",0,0,0);
+	trans[1][3]	= settr(0,0,0,0,0,"assert((x>=0))",0,0,0);
+	trans[1][7]	= settr(18,0,9,1,0,".(goto)", 1, 2, 0);
+	trans[1][4]	= settr(15,2,5,2,0,"else", 1, 2, 0);
+	trans[1][5]	= settr(16,0,12,1,0,"goto :b1", 1, 2, 0);
+	trans[1][11]	= settr(22,0,12,1,0,"break", 0, 2, 0);
+	trans[1][12]	= settr(23,0,0,6,6,"-end-", 0, 3500, 0);
 
 	/* proctype 0: P */
 
-	trans[0] = (Trans **) emalloc(12*sizeof(Trans *));
+	trans[0] = (Trans **) emalloc(13*sizeof(Trans *));
 
-	trans[0][9]	= settr(8,0,8,1,0,".(goto)", 0, 2, 0);
-	T = trans[0][8] = settr(7,0,0,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(7,0,6,0,0,"DO", 0, 2, 0);
-	T = trans[0][6] = settr(5,0,0,0,0,"IF", 0, 2, 0);
-	T = T->nxt	= settr(5,0,1,0,0,"IF", 0, 2, 0);
-	    T->nxt	= settr(5,0,4,0,0,"IF", 0, 2, 0);
-	trans[0][1]	= settr(0,0,3,9,0,"((x<200))", 1, 2, 0);
-	T = trans[ 0][3] = settr(2,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(2,2,2,0,0,"ATOMIC", 1, 2, 0);
-	trans[0][2]	= settr(1,0,8,10,10,"x = (x+1)", 1, 2, 0);
-	trans[0][7]	= settr(6,0,8,1,0,".(goto)", 0, 2, 0);
-	trans[0][4]	= settr(3,0,11,2,0,"else", 0, 2, 0);
-	trans[0][5]	= settr(4,0,11,1,0,"goto :b0", 0, 2, 0);
-	trans[0][10]	= settr(9,0,11,1,0,"break", 0, 2, 0);
-	trans[0][11]	= settr(10,0,0,11,11,"-end-", 0, 3500, 0);
+	trans[0][10]	= settr(9,0,9,1,0,".(goto)", 0, 2, 0);
+	T = trans[0][9] = settr(8,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(8,0,8,0,0,"DO", 0, 2, 0);
+	T = trans[ 0][8] = settr(7,2,0,0,0,"ATOMIC", 1, 2, 0);
+	T->nxt	= settr(7,2,6,0,0,"ATOMIC", 1, 2, 0);
+	T = trans[0][6] = settr(5,2,0,0,0,"IF", 1, 2, 0);
+	T = T->nxt	= settr(5,2,1,0,0,"IF", 1, 2, 0);
+	    T->nxt	= settr(5,2,4,0,0,"IF", 1, 2, 0);
+	trans[0][1]	= settr(0,0,9,7,7,"((x<200))", 1, 2, 0); /* m: 2 -> 9,0 */
+	reached0[2] = 1;
+	trans[0][2]	= settr(0,0,0,0,0,"x = (x+1)",0,0,0);
+	trans[0][3]	= settr(0,0,0,0,0,"assert((x<=200))",0,0,0);
+	trans[0][7]	= settr(6,0,9,1,0,".(goto)", 1, 2, 0);
+	trans[0][4]	= settr(3,2,5,2,0,"else", 1, 2, 0);
+	trans[0][5]	= settr(4,0,12,1,0,"goto :b0", 1, 2, 0);
+	trans[0][11]	= settr(10,0,12,1,0,"break", 0, 2, 0);
+	trans[0][12]	= settr(11,0,0,8,8,"-end-", 0, 3500, 0);
 	/* np_ demon: */
 	trans[_NP_] = (Trans **) emalloc(3*sizeof(Trans *));
 	T = trans[_NP_][0] = settr(9997,0,1,_T5,0,"(np_)", 1,2,0);

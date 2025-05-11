@@ -491,42 +491,42 @@ int _;	/* predefined write-only variable */
 #endif
 
 short src_ln2 [] = {
-	  0,  37,  39,  38,  41,  41,  36,  43, 
-	 34,  45,  34,  45,   0, };
+	  0,  38,  40,  41,  42,  42,  37,  44, 
+	 36,  34,  47,  34,  47,   0, };
 S_F_MAP src_file2 [] = {
 	{ "-", 0, 0 },
-	{ "ex1.pml", 1, 11 },
-	{ "-", 12, 13 }
+	{ "ex1.pml", 1, 12 },
+	{ "-", 13, 14 }
 };
 uchar reached2 [] = {
-	  0,   1,   1,   0,   1,   1,   1,   1, 
-	  0,   1,   1,   0,   0, };
+	  0,   1,   0,   0,   1,   1,   1,   1, 
+	  1,   0,   1,   1,   0,   0, };
 uchar *loopstate2;
 
 short src_ln1 [] = {
-	  0,  23,  25,  24,  27,  27,  22,  29, 
-	 20,  30,  20,  30,   0, };
+	  0,  23,  24,  25,  26,  26,  22,  28, 
+	 21,  19,  30,  19,  30,   0, };
 S_F_MAP src_file1 [] = {
 	{ "-", 0, 0 },
-	{ "ex1.pml", 1, 11 },
-	{ "-", 12, 13 }
+	{ "ex1.pml", 1, 12 },
+	{ "-", 13, 14 }
 };
 uchar reached1 [] = {
-	  0,   1,   1,   0,   1,   1,   1,   1, 
-	  0,   1,   1,   0,   0, };
+	  0,   1,   0,   0,   1,   1,   1,   1, 
+	  1,   0,   1,   1,   0,   0, };
 uchar *loopstate1;
 
 short src_ln0 [] = {
-	  0,   7,   9,   8,  11,  11,   6,  13, 
-	  4,  14,   4,  14,   0, };
+	  0,   8,   9,  10,  11,  11,   7,  13, 
+	  6,   4,  15,   4,  15,   0, };
 S_F_MAP src_file0 [] = {
 	{ "-", 0, 0 },
-	{ "ex1.pml", 1, 11 },
-	{ "-", 12, 13 }
+	{ "ex1.pml", 1, 12 },
+	{ "-", 13, 14 }
 };
 uchar reached0 [] = {
-	  0,   1,   1,   0,   1,   1,   1,   1, 
-	  0,   1,   1,   0,   0, };
+	  0,   1,   0,   0,   1,   1,   1,   1, 
+	  1,   0,   1,   1,   0,   0, };
 uchar *loopstate0;
 uchar reached3[3];  /* np_ */
 uchar *loopstate3;  /* np_ */
@@ -839,11 +839,11 @@ addproc(int calling_pid, int priority, int n)
 		break;
 	case 2:	/* R */
 		((P2 *)pptr(h))->_t = 2;
-		((P2 *)pptr(h))->_p = 8;
+		((P2 *)pptr(h))->_p = 9;
 #ifdef HAS_PRIORITY
 		((P2 *)pptr(h))->_priority = priority; /* was: 1 */
 #endif
-		reached2[8]=1;
+		reached2[9]=1;
 		/* params: */
 		/* locals: */
 #ifdef VAR_RANGES
@@ -854,11 +854,11 @@ addproc(int calling_pid, int priority, int n)
 		break;
 	case 1:	/* Q */
 		((P1 *)pptr(h))->_t = 1;
-		((P1 *)pptr(h))->_p = 8;
+		((P1 *)pptr(h))->_p = 9;
 #ifdef HAS_PRIORITY
 		((P1 *)pptr(h))->_priority = priority; /* was: 1 */
 #endif
-		reached1[8]=1;
+		reached1[9]=1;
 		/* params: */
 		/* locals: */
 #ifdef VAR_RANGES
@@ -869,11 +869,11 @@ addproc(int calling_pid, int priority, int n)
 		break;
 	case 0:	/* P */
 		((P0 *)pptr(h))->_t = 0;
-		((P0 *)pptr(h))->_p = 8;
+		((P0 *)pptr(h))->_p = 9;
 #ifdef HAS_PRIORITY
 		((P0 *)pptr(h))->_priority = priority; /* was: 1 */
 #endif
-		reached0[8]=1;
+		reached0[9]=1;
 		/* params: */
 		/* locals: */
 #ifdef VAR_RANGES
@@ -14116,7 +14116,7 @@ c_chandump(int unused)
 {	unused++; /* avoid complaints */
 }
 
-Trans *t_id_lkup[33];
+Trans *t_id_lkup[36];
 
 
 #ifdef BFS_PAR

@@ -132,20 +132,20 @@ typedef struct S_F_MAP {
 	int upto;
 } S_F_MAP;
 
-#define _nstates2	12	/* R */
-#define minseq2	22
-#define maxseq2	32
-#define _endstate2	11
+#define _nstates2	13	/* R */
+#define minseq2	24
+#define maxseq2	35
+#define _endstate2	12
 
-#define _nstates1	12	/* Q */
-#define minseq1	11
-#define maxseq1	21
-#define _endstate1	11
+#define _nstates1	13	/* Q */
+#define minseq1	12
+#define maxseq1	23
+#define _endstate1	12
 
-#define _nstates0	12	/* P */
+#define _nstates0	13	/* P */
 #define minseq0	0
-#define maxseq0	10
-#define _endstate0	11
+#define maxseq0	11
+#define _endstate0	12
 
 extern short src_ln2[];
 extern short src_ln1[];
@@ -155,8 +155,8 @@ extern S_F_MAP src_file1[];
 extern S_F_MAP src_file0[];
 
 #define T_ID	unsigned char
-#define _T5	12
-#define _T2	13
+#define _T5	9
+#define _T2	10
 #define WS		8 /* word size in bytes */
 #define SYNC	0
 #define ASYNC	0
@@ -434,9 +434,9 @@ typedef struct TRIX_v6 {
 #define _endstate3	2 /* np_ */
 
 #define _start3	0 /* np_ */
-#define _start2	8
-#define _start1	8
-#define _start0	8
+#define _start2	9
+#define _start1	9
+#define _start0	9
 #ifdef NP
 	#define ACCEPT_LAB	1 /* at least 1 in np_ */
 #else
@@ -796,7 +796,7 @@ void qsend(int, int, int);
 #define GLOBAL	7
 #define BAD	8
 #define ALPHA_F	9
-#define NTRANS	14
+#define NTRANS	11
 #if defined(BFS_PAR) || NCORE>1
 	void e_critical(int);
 	void x_critical(int);

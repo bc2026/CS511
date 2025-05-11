@@ -20,14 +20,12 @@
 		_m = 3; goto P999;
 
 		 /* PROC R */
-	case 3: // STATE 1 - ex1.pml:37 - [((x<200))] (0:0:0 - 1)
+	case 3: // STATE 1 - ex1.pml:38 - [((x==200))] (9:0:1 - 1)
 		IfNotBlocked
 		reached[2][1] = 1;
-		if (!((now.x<200)))
+		if (!((now.x==200)))
 			continue;
-		_m = 3; goto P999; /* 0 */
-	case 4: // STATE 2 - ex1.pml:39 - [x = 0] (0:0:1 - 1)
-		IfNotBlocked
+		/* merge: x = 0(9, 2, 9) */
 		reached[2][2] = 1;
 		(trpt+1)->bup.oval = now.x;
 		now.x = 0;
@@ -35,22 +33,29 @@
 		logval("x", now.x);
 #endif
 		;
-		_m = 3; goto P999; /* 0 */
-	case 5: // STATE 11 - ex1.pml:45 - [-end-] (0:0:0 - 3)
+		/* merge: assert(((x>=0)&&(x<=200)))(9, 3, 9) */
+		reached[2][3] = 1;
+		spin_assert(((now.x>=0)&&(now.x<=200)), "((x>=0)&&(x<=200))", II, tt, t);
+		/* merge: .(goto)(9, 7, 9) */
+		reached[2][7] = 1;
+		;
+		/* merge: .(goto)(0, 10, 9) */
+		reached[2][10] = 1;
+		;
+		_m = 3; goto P999; /* 4 */
+	case 4: // STATE 12 - ex1.pml:47 - [-end-] (0:0:0 - 1)
 		IfNotBlocked
-		reached[2][11] = 1;
+		reached[2][12] = 1;
 		if (!delproc(1, II)) continue;
 		_m = 3; goto P999; /* 0 */
 
 		 /* PROC Q */
-	case 6: // STATE 1 - ex1.pml:23 - [((x<200))] (0:0:0 - 1)
+	case 5: // STATE 1 - ex1.pml:23 - [((x>0))] (9:0:1 - 1)
 		IfNotBlocked
 		reached[1][1] = 1;
-		if (!((now.x<200)))
+		if (!((now.x>0)))
 			continue;
-		_m = 3; goto P999; /* 0 */
-	case 7: // STATE 2 - ex1.pml:25 - [x = (x-1)] (0:0:1 - 1)
-		IfNotBlocked
+		/* merge: x = (x-1)(9, 2, 9) */
 		reached[1][2] = 1;
 		(trpt+1)->bup.oval = now.x;
 		now.x = (now.x-1);
@@ -58,22 +63,29 @@
 		logval("x", now.x);
 #endif
 		;
-		_m = 3; goto P999; /* 0 */
-	case 8: // STATE 11 - ex1.pml:30 - [-end-] (0:0:0 - 3)
+		/* merge: assert((x>=0))(9, 3, 9) */
+		reached[1][3] = 1;
+		spin_assert((now.x>=0), "(x>=0)", II, tt, t);
+		/* merge: .(goto)(9, 7, 9) */
+		reached[1][7] = 1;
+		;
+		/* merge: .(goto)(0, 10, 9) */
+		reached[1][10] = 1;
+		;
+		_m = 3; goto P999; /* 4 */
+	case 6: // STATE 12 - ex1.pml:30 - [-end-] (0:0:0 - 1)
 		IfNotBlocked
-		reached[1][11] = 1;
+		reached[1][12] = 1;
 		if (!delproc(1, II)) continue;
 		_m = 3; goto P999; /* 0 */
 
 		 /* PROC P */
-	case 9: // STATE 1 - ex1.pml:7 - [((x<200))] (0:0:0 - 1)
+	case 7: // STATE 1 - ex1.pml:8 - [((x<200))] (9:0:1 - 1)
 		IfNotBlocked
 		reached[0][1] = 1;
 		if (!((now.x<200)))
 			continue;
-		_m = 3; goto P999; /* 0 */
-	case 10: // STATE 2 - ex1.pml:9 - [x = (x+1)] (0:0:1 - 1)
-		IfNotBlocked
+		/* merge: x = (x+1)(9, 2, 9) */
 		reached[0][2] = 1;
 		(trpt+1)->bup.oval = now.x;
 		now.x = (now.x+1);
@@ -81,10 +93,19 @@
 		logval("x", now.x);
 #endif
 		;
-		_m = 3; goto P999; /* 0 */
-	case 11: // STATE 11 - ex1.pml:14 - [-end-] (0:0:0 - 3)
+		/* merge: assert((x<=200))(9, 3, 9) */
+		reached[0][3] = 1;
+		spin_assert((now.x<=200), "(x<=200)", II, tt, t);
+		/* merge: .(goto)(9, 7, 9) */
+		reached[0][7] = 1;
+		;
+		/* merge: .(goto)(0, 10, 9) */
+		reached[0][10] = 1;
+		;
+		_m = 3; goto P999; /* 4 */
+	case 8: // STATE 12 - ex1.pml:15 - [-end-] (0:0:0 - 1)
 		IfNotBlocked
-		reached[0][11] = 1;
+		reached[0][12] = 1;
 		if (!delproc(1, II)) continue;
 		_m = 3; goto P999; /* 0 */
 	case  _T5:	/* np_ */
