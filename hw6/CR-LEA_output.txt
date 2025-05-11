@@ -1,0 +1,20 @@
+                  Node 3 started
+          Node 1 started
+                      Node 4 started
+                          Node 5 started
+              Node 2 started
+                      Node 4: LOST
+                          Node 5: LOST
+          Node 1: LOST
+      timeout
+#processes: 4
+		queue 1 (q[0]): 
+		queue 2 (q[1]): 
+		queue 3 (q[2]): [id_msg,5][leader_msg,3]
+		queue 4 (q[3]): [leader_msg,2]
+		queue 5 (q[4]): 
+140:	proc  3 (Node:1) CR-LEA.pml:19 (state 44)
+140:	proc  2 (Node:1) CR-LEA.pml:19 (state 44)
+140:	proc  1 (Node:1) CR-LEA.pml:60 (state 47) <valid end state>
+140:	proc  0 (:init::1) CR-LEA.pml:74 (state 11) <valid end state>
+6 processes created
